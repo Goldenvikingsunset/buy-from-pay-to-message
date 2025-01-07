@@ -1,40 +1,43 @@
-# Customer Change Validation Extension
+# Auto Confirm Customer Changes
 
-## Overview
-Enhances Business Central's customer change functionality with improved validation and user experience.
-For suppressing the warning messages that appear when changing the Sell-to Customer and Bill-to Customer fields on sales documents in Business Central.
-
-## Features
-- Auto-confirm customer changes (configurable)
-- Status validation
-- Warehouse shipment validation
-- Graceful error handling
-
-## Setup
-1. Open Sales & Receivables Setup
-2. Set "Auto Confirm Customer Change" option
+Functionality to automatically confirm customer changes on sales documents with proper validation.
 
 ## Process Flow
 
 ```mermaid
 flowchart TD
-    A[Start Customer Change] --> B{Check Document Status}
-    B -->|Released/Pending| C[Show Status Message]
-    B -->|Open| D{Check Warehouse Shipments}
-    D -->|Exists| E[Show Warehouse Message]
-    D -->|None| F{Check Sales Lines}
-    F -->|Exists| G{Confirm Recreation}
-    F -->|None| H[Process Change]
-    G -->|Yes| H
-    G -->|No| I[Cancel]
-    C --> I
-    E --> I
-    H --> J[End]
-    I --> J
+    A[User Changes Customer] --> B{Document Status?}
+    B -->|Released/Pending| C[Show Message to Reopen]
+    B -->|Open| D{Has Warehouse Shipments?}
+    D -->|Yes| E[Show Error Message]
+    D -->|No| F{Has Sales Lines?}
+    F -->|Yes| G{Auto Confirm Enabled?}
+    F -->|No| H{Auto Confirm Enabled?}
+    G -->|Yes| I[Show Line Delete Warning]
+    G -->|No| J[Show Standard Confirm]
+    H -->|Yes| K[Change Customer]
+    H -->|No| L[Show Standard Confirm]
+    I -->|User Confirms| K
+    I -->|User Cancels| M[Cancel Change]
+    J -->|User Confirms| K
+    J -->|User Cancels| M
+    L -->|User Confirms| K
+    L -->|User Cancels| M
 ```
 
-## Technical Details
-- Objects:
-  - Table Ext 50100 "Sales & Receivables Setup Ext"
-  - Page Ext 50100 "Sales & Receivables Setup Ext"
-  - Codeunit 50550 "Sales Document Subscribers"
+## Setup
+
+1. Open Sales & Receivables Setup
+2. Enable "Auto Confirm Customer Change" toggle
+
+## Validations
+
+- Document must be in Open status
+- No warehouse shipments can exist
+- Sales line deletion warning if lines exist
+
+## Error Messages
+
+- Status error: "Document must be in Open status to modify..."
+- Warehouse error: "Cannot change customer when warehouse shipments exist..."
+- Line deletion warning: "If you change Sell-to Customer, the existing sales lines..."
