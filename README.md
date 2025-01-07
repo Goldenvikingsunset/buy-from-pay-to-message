@@ -2,6 +2,7 @@
 
 ## Overview
 Enhances Business Central's customer change functionality with improved validation and user experience.
+For suppressing the warning messages that appear when changing the Sell-to Customer and Bill-to Customer fields on sales documents in Business Central.
 
 ## Features
 - Auto-confirm customer changes (configurable)
